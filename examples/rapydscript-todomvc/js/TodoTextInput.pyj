@@ -1,0 +1,67 @@
+"""
+ Copyright (c) 2015, Sinergetica S.R.L.
+ All rights reserved.
+
+  This source code is licensed under the BSD-style license found in the
+  LICENSE file in the root directory of this source tree. An additional grant
+  of patent rights can be found in the PATENTS file in the same directory.
+ """
+
+import rapydflux
+import TodoActions
+
+ReactPropTypes = React.PropTypes
+
+ENTER_KEY_CODE = 13
+
+class TodoTextInput(Component):
+
+    self.propTypes = {
+                     className: ReactPropTypes.string,
+                     id: ReactPropTypes.string,
+                     placeholder: ReactPropTypes.string,
+                     onSave: ReactPropTypes.func.isRequired,
+                     value: ReactPropTypes.string
+    }
+
+    def __init__(self, *args):
+        self._save = self._save
+        self._onChange = self._onChange
+        self._onKeyDown = self._onKeyDown
+        Component.__init__(self, args)
+
+    def getInitialState(self):
+        value = ""
+        if self.props.value != None:
+            value = self.props.value
+        return {value: value}
+
+    def render(self):
+        widget = React.DOM.input(
+                  {className: self.props.className,
+                   id: self.props.id,
+                   placeholder: self.props.placeholder,
+                   onBlur: self._save,
+                   onChange: self._onChange,
+                   onKeyDown: self._onKeyDown,
+                   value: self.state.value,
+                   autoFocus: true,
+                   ref:"text"
+                  }, None)
+
+        return widget
+
+    def  _save(self):
+        text = self.refs.text.getDOMNode().value.trim()
+        if text:
+            self.props.onSave({id:self.props.id,text:text})
+        self.setState({value: '' })
+
+    def _onChange(self, event):
+        self.setState({
+                   value: event.target.value
+                   })
+
+    def _onKeyDown(self, event):
+        if (event.keyCode is ENTER_KEY_CODE):
+            self._save()

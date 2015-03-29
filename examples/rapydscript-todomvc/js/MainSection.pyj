@@ -1,0 +1,45 @@
+import rapydflux
+import TodoActions
+import TodoItem
+
+ReactPropTypes = React.PropTypes
+
+
+class MainSection(Component):
+
+    def __init__(self, *args):
+        propTypes = {
+            allTodos: ReactPropTypes.object.isRequired,
+            areAllComplete: ReactPropTypes.bool.isRequired
+          }
+        self._isChecked = self._isChecked
+        self._onToggleCompleteAll = self._onToggleCompleteAll
+        Component.__init__(self, args)
+
+    def render(self):
+        if len(self.props.allTodos) < 1:
+            return None
+
+        allTodos = self.props.allTodos
+        todos = []
+        keys = Object.keys(allTodos)
+        for key in keys:
+            todoItem = TodoItem(props = {key:key, todo:allTodos[key]})
+            todos.push(todoItem.c)
+
+        return DOM.section({id:"main"},
+                           [DOM.input({id: "toggle-all",
+                              type: "checkbox",
+                              onChange: self._onToggleCompleteAll,
+                              checked: self._isChecked}),
+                           DOM.label({htmlFor:"toggle-all"}, "Mark all as complete"),
+                           DOM.ul({id:"todo-list"}, todos)])
+
+    def _isChecked(self):
+        if self.props.areAllComplete:
+            return 'checked'
+        else:
+            return ''
+
+    def _onToggleCompleteAll(self):
+        todoActions.toggleCompleteAll()

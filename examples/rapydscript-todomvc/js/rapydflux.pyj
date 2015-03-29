@@ -1,0 +1,100 @@
+DOM = React.DOM
+
+class Component:
+
+    def __init__(self, *args):
+        self.props = {}
+#         console.log("Component.init.data:",self, data)
+        ## React Compoponent specs and lifecycle
+        ## http://facebook.github.io/react/docs/component-specs.html
+        params = {
+                  render: self.render,
+                  getInitialState: self.getInitialState,
+                  getDefaultProps: self.getDefaultProps,
+                  propTypes: self.propTypes,
+                  mixins: self.mixins,
+                  statics: self.statics,
+                  displayName: self.displayName,
+                  componentWillMount: self.componentWillMount,
+                  componentDidMount: self.componentDidMount,
+                  componentWillReceiveProps: self.componentWillReceiveProps,
+                  shouldComponentUpdate: self.shouldComponentUpdate,
+                  componentWillUpdate: self.componentWillUpdate,
+                  componentDidUpdate: self.componentDidUpdate,
+                  componentWillUnmount: self.componentWillUnmount
+                  }
+        keys = Object.keys(self)
+        pkeys = Object.keys(params)
+        for key in keys:
+            if key not in ['constructor', '__proto__'] or key not in pkeys:
+                params[key] = self[key]
+        if args[0] is not undefined:
+            keys = Object.keys(args[0])
+            for key in keys:
+                params[key] = args[0][key]
+            if args[0][0] is not undefined:
+                keys = Object.keys(args[0][0])
+                arg = args[0]
+                for key in keys:
+                    if key not in ['constructor', '__proto__'] or key not in pkeys:
+                        params[key] = args[0][0][key]
+        react_component = React.createClass(params)()
+        self.c = react_component
+        self.c = self._extend(self.c, params)
+        return self.c
+
+    def _extend(self, target, source):
+        options = Object.keys(source)
+        for name in options:
+            copy = source[name]
+            #avoid infint loops
+            if target is copy:
+                continue
+            if copy is not undefined:
+                target[name] = copy
+        return target
+
+class Dispatcher:
+
+    def __init__(self, act):
+        self.actions = {}
+        keys = Object.keys(act)
+        for key in keys:
+            self.actions[key] = []
+
+# attach a function to an action
+    def attach(self, action,ds, func):
+        if action not in self.actions:
+            self.actions[action] = []
+        self.actions[action].push({ds:ds,func:func})
+
+# detach a function from an action
+#     def detach(self, action, func):
+#         self.actions[action].delete(func)
+
+# call all listeners for this action
+    def action(self, payload):
+        for act in self.actions[payload.action]:
+            act.func.call(act.ds, payload.payload)
+
+class DataStore:
+
+    def __init__(self):
+        self.observers = []
+
+    def getData(self):
+        return self.data
+
+# attach a component to this data
+    def attach(self, comp):
+        if self.observers is undefined:
+            self.observers = []
+        self.observers.push(comp)
+
+# notify component of data change, render the component
+    def notify(self):
+        for observer in self.observers:
+            observer()
+
+
+

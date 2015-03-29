@@ -1,0 +1,69 @@
+"""
+ Copyright (c) 2015, Sinergetica S.R.L.
+ All rights reserved.
+
+  This source code is licensed under the BSD-style license found in the
+  LICENSE file in the root directory of this source tree. An additional grant
+  of patent rights can be found in the PATENTS file in the same directory.
+ """
+
+import rapydflux
+import TodoActions
+
+ReactPropTypes = React.PropTypes
+
+class Footer(Component):
+
+    def  _onClearCompletedClick(self):
+        todoActions.destroyCompleted()
+
+    def render(self):
+        allTodos = self.props.allTodos
+        nowShowing = this.props.nowShowing
+        total = len(allTodos)  # Object.keys(allTodos).length
+
+        if (total == 0):
+            return None
+
+        completed = 0
+        for key in Object.keys(allTodos):
+            isCompleted = allTodos[key].complete
+
+            if isCompleted:
+                completed += 1
+
+        itemsLeft = total - completed
+        if itemsLeft == 1:
+            itemsLeftPhrase = ' item'
+        else:
+            itemsLeftPhrase = ' items'
+        itemsLeftPhrase += ' left'
+
+        clearCompletedButton = DOM.button()
+        if completed:
+            clearCompletedButton = DOM.button({id: "clear-completed",
+                                                 onClick: self._onClearCompletedClick },
+                                                "clear completed (" + completed + ")")
+
+
+        widget = React.DOM.footer({id:"footer"},[React.DOM.span({id:"todo-count"},
+                                                [React.DOM.strong(None, itemsLeft), itemsLeftPhrase]),
+                                                DOM.ul({id: "filters"},
+                                                       [DOM.li(None,
+                                                               DOM.a({href: '#',
+                                                                      className: cx({'selected': nowShowing is APP_ALL_TODOS})}, "All")),
+                                                       DOM.li(None,
+                                                               DOM.a({href: '#/active',
+                                                                      className: cx({'selected': nowShowing is APP_ACTIVE_TODOS})}, "Active")),
+                                                       DOM.li(None,
+                                                               DOM.a({href: '#/completed',
+                                                                      className: cx({'selected': nowShowing is APP_COMPLETED_TODOS})}, "Completed"))]),
+                                                clearCompletedButton])
+        return widget
+
+
+
+    def __init__(self, *args):
+        self.propTypes = {allTodos: ReactPropTypes.object.isRequired}
+        self._onClearCompletedClick=self._onClearCompletedClick
+        Component.__init__(self, args)

@@ -1,0 +1,32 @@
+"""
+ Copyright (c) 2015, Sinergetica S.R.L.
+ All rights reserved.
+
+  This source code is licensed under the BSD-style license found in the
+  LICENSE file in the root directory of this source tree. An additional grant
+  of patent rights can be found in the PATENTS file in the same directory.
+ """
+
+import rapydflux
+import TodoActions
+import TodoTextInput
+
+
+class Header(Component):
+
+    def _onSave(self, data):
+        text = data.text.trim()
+        if text:
+            todoActions.create(text)
+
+    def render(self):
+        todoTextInput = TodoTextInput(props={id: 'new-todo',
+           placeholder: 'What needs to be done?',
+           onSave: self._onSave})
+        widget = DOM.header({id:"header"},
+                    [DOM.h1(None, "todos"), todoTextInput.c])
+        return widget
+
+    def __init__(self, *args):
+        self._onSave = self._onSave
+        Component.__init__(self, args)

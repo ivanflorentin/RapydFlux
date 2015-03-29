@@ -1,0 +1,34 @@
+class TodoActions:
+    def create(self, data):
+        dispatcher.action({
+            action: 'create',
+            payload: data})
+
+    def destroy(self, data):
+        dispatcher.action({
+            action: 'destroy',
+            payload: data})
+
+    def toggleComplete(self, data):
+        dispatcher.action({
+            action: 'toggleComplete',
+            payload: data})
+
+    def updateText(self, data):
+        dispatcher.action({
+            action: 'updateText',
+            payload: data})
+
+    def toggleCompleteAll(self, data):
+        dispatcher.action({
+            action: 'toggleCompleteAll',
+            payload: data})
+
+    def destroyCompleted(self, data):
+        dispatcher.action({
+            action: 'destroyCompleted',
+            payload: data})
+
+
+todoActions = TodoActions()
+

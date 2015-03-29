@@ -1,0 +1,68 @@
+import rapydflux
+import TodoActions
+import TodoTextInput
+
+ReactPropTypes = React.PropTypes
+
+class TodoItem(Component):
+
+    def __init__(self, *args):
+        self.propTypes = ReactPropTypes.object.isRequired
+        self._onToggleComplete = self._onToggleComplete
+        self._onDoubleClick = self._onDoubleClick
+        self._onSave = self._onSave
+        self._onDestroyClick = self._onDestroyClick
+        Component.__init__(self, args)
+
+    def getInitialState(self):
+        return {isEditing: False}
+
+    def render(self):
+        todo = self.props.todo
+
+        input = None
+        if self.state.isEditing:
+            input = TodoTextInput(props = {onSave: self._onSave,
+                                           id: self.props.todo.id,
+                                           className: 'edit',
+                                           value: todo.text,
+                                           todo: todo})
+
+        widget = DOM.li({className: cx({
+          'completed': todo.complete,
+          'editing': this.state.isEditing}), key: todo.id},
+            [DOM.div({className: "view"},
+                [DOM.input({className:"toggle",
+                    type: "checkbox",
+                    checked: todo.complete,
+                    onChange: self._onToggleComplete}, None),
+                    DOM.label({onDoubleClick: self._onDoubleClick},todo.text),
+                        DOM.button({className: "destroy", 
+                                    onClick: self._onDestroyClick}, None)]),
+                        input])
+
+        return widget
+
+
+#     def componentWillMount(slef):
+#         console.log(self.props)
+
+
+    def _onToggleComplete(self):
+        todoActions.toggleComplete(self.props.todo)
+
+    def _onDoubleClick(self):
+        self.setState({isEditing: True})
+
+#     Event handler called within TodoTextInput.
+#     Defining this here allows TodoTextInput to be used in multiple places
+#     in different ways.
+#     @param  {string} text
+    def _onSave(self, data):
+        todoActions.updateText(data)
+        self.setState({isEditing: False})
+
+    def _onDestroyClick(self):
+        todoActions.destroy(self.props.todo.id);
+
+

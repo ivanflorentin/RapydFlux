@@ -1,0 +1,64 @@
+import rapydflux
+#import AppDispatcher
+
+
+class TodoStore(DataStore):
+
+    def __init__(self, dispatcher):
+        self._todos = {}
+        self.dispatcher = dispatcher
+        dispatcher.attach("create",self, self.create)
+        dispatcher.attach("destroy",self, self.destroy)
+        dispatcher.attach("toggleComplete",self, self.toggleComplete)
+        dispatcher.attach("toggleCompleteAll",self, self.toggleCompleteAll)
+        dispatcher.attach("updateText",self, self.updateText)
+        dispatcher.attach("destroyCompleted",self, self.destroyCompleted)
+        DataStore.__init__()
+
+    def create(self, text):
+        id = ( Date() + Math.floor(Math.random() * 999999)).toString(36)
+        self._todos[id] = {id: id,
+            complete: false,
+             text: text}
+        self.notify()
+
+    def getAll(self):
+        return self._todos
+
+    def areAllComplete(self):
+        for id in self._todos:
+            if not self._todos[id].complete:
+                return False
+        return True
+
+    def destroy(self, id):
+        del self._todos[id]
+        self.notify()
+
+    def toggleComplete(self, todo):
+        if todo.complete:
+            todo.complete = False
+        else:
+            todo.complete = True
+        self.notify()
+
+    def toggleCompleteAll(self, data):
+        keys = Object.keys(self._todos)
+        for key in keys:
+            self._todos[key].complete = True
+        self.notify()
+
+    def updateText(self, data):
+        self._todos[data.id].text = data.text
+        self.notify()
+
+    def destroyCompleted(self, data):
+        keys = Object.keys(self._todos)
+        for key in keys:
+            todo = self._todos[key]
+            if todo.complete:
+                del self._todos[key]
+
+        self.notify()
+
+

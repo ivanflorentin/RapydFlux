@@ -1,0 +1,70 @@
+import rapydflux
+import Footer
+import Header
+import MainSection
+import TodoStore
+import TodoActions
+
+
+dispatcher = Dispatcher(todoActions)
+todoStore = TodoStore(dispatcher)
+
+APP_ALL_TODOS = 'all'
+APP_ACTIVE_TODOS = 'active'
+APP_COMPLETED_TODOS = 'completed'
+
+
+class TodoApp(Component):
+
+    def __init__(self, *args):
+        self._onChange = self._onChange
+        self.getTodoState = self.getTodoState
+        Component.__init__(self, args)
+
+
+    def getTodoState(self):
+        return {allTodos: todoStore.getAll(),
+            areAllComplete: todoStore.areAllComplete()}
+
+    def componentDidMount(self):
+        todoStore.attach(self._onChange)
+        setState = self.setState
+
+        router = Router({'/': setState.bind(self, {nowShowing: APP_ALL_TODOS}),
+                         '/active': setState.bind(self, {nowShowing: APP_ACTIVE_TODOS}),
+                         '/completed': setState.bind(self, {nowShowing: APP_COMPLETED_TODOS})
+                        })
+        router.init('/')
+
+    def render(self):
+        header = Header()
+        allTodos = self.state.allTodos
+        keys = Object.keys(allTodos)
+        nowShowing = self.state.nowShowing
+        shownTodos = []
+
+        for key in keys:
+            console.log("TODO: ", allTodos[key])
+            todo = allTodos[key]
+
+            if (nowShowing is APP_ACTIVE_TODOS) and !todo.complete:
+                shownTodos.push(todo)
+            elif (nowShowing is APP_COMPLETED_TODOS) and todo.complete:
+                shownTodos.push(todo)
+            elif nowShowing is APP_ALL_TODOS:
+                shownTodos.push(todo)
+
+
+        ms = MainSection(props={allTodos: shownTodos,
+                          areAllComplete: this.state.areAllComplete})
+        footer = Footer(props={allTodos: allTodos,
+                                nowShowing: self.state.nowShowing})
+        return React.DOM.div(None, [header, ms, footer])
+
+    def _onChange(self):
+        self.setState(self.getTodoState())
+
+    def getInitialState(self):
+        return self.getTodoState()
+
+
